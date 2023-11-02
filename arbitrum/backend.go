@@ -111,7 +111,7 @@ func (b *Backend) EnqueueL2MessageEspresso(ctx context.Context, tx *types.Transa
 	if err != nil {
 		return err
 	}
-	// json.RawMessage is a []byte array, which is marshalled as a base64-encoded string.
+	//	json.RawMessage is a []byte array, which is marshalled as a base64-encoded string.
 	//	Our sequencer API expects a JSON array.
 	payload := make([]int, len(txnBytes))
 	for i := range payload {
@@ -123,11 +123,11 @@ func (b *Backend) EnqueueL2MessageEspresso(ctx context.Context, tx *types.Transa
 	}
 	marshalled, err := json.Marshal(txn)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	request, err := http.NewRequest("POST", b.config.HotShotUrl, bytes.NewBuffer(marshalled))
 	if err != nil {
-		panic(err)
+		return err
 	}
 	request.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
