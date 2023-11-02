@@ -1,7 +1,10 @@
 package arbitrum
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"net/http"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/arbitrum_types"
@@ -87,8 +90,55 @@ func (b *Backend) ResetWithGenesisBlock(gb *types.Block) {
 	b.arb.BlockChain().ResetWithGenesisBlock(gb)
 }
 
+type Transaction struct {
+	Vm      uint64 `json:"vm"`
+	Payload []int  `json:"payload"`
+}
+
 func (b *Backend) EnqueueL2Message(ctx context.Context, tx *types.Transaction, options *arbitrum_types.ConditionalOptions) error {
+	if b.config.Espresso {
+		return b.EnqueueL2MessageEspresso(ctx, tx, options)
+	}
+	return b.EnqueueL2MessageDefault(ctx, tx, options)
+}
+
+func (b *Backend) EnqueueL2MessageDefault(ctx context.Context, tx *types.Transaction, options *arbitrum_types.ConditionalOptions) error {
 	return b.arb.PublishTransaction(ctx, tx, options)
+}
+
+func (b *Backend) EnqueueL2MessageEspresso(ctx context.Context, tx *types.Transaction, options *arbitrum_types.ConditionalOptions) error {
+	var txnBytes, err = json.Marshal(tx)
+	if err != nil {
+		return err
+	}
+	// json.RawMessage is a []byte array, which is marshalled as a base64-encoded string.
+	//	Our sequencer API expects a JSON array.
+	payload := make([]int, len(txnBytes))
+	for i := range payload {
+		payload[i] = int(txnBytes[i])
+	}
+	txn := Transaction{
+		Vm:      b.config.EspressoNamespace,
+		Payload: payload,
+	}
+	marshalled, err := json.Marshal(txn)
+	if err != nil {
+		panic(err)
+	}
+	request, err := http.NewRequest("POST", b.config.HotShotUrl, bytes.NewBuffer(marshalled))
+	if err != nil {
+		panic(err)
+	}
+	request.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		return err
+	}
+	if response.StatusCode != 200 {
+		return err
+	}
+	return nil
 }
 
 func (b *Backend) SubscribeNewTxsEvent(ch chan<- core.NewTxsEvent) event.Subscription {
