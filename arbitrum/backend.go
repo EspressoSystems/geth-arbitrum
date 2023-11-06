@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/ethereum/go-ethereum/accounts"
@@ -91,8 +92,8 @@ func (b *Backend) ResetWithGenesisBlock(gb *types.Block) {
 }
 
 type Transaction struct {
-	Vm      uint64 `json:"vm"`
-	Payload []int  `json:"payload"`
+	Vm      int    `json:"vm"`
+	Payload []int8 `json:"payload"`
 }
 
 func (b *Backend) EnqueueL2Message(ctx context.Context, tx *types.Transaction, options *arbitrum_types.ConditionalOptions) error {
@@ -113,19 +114,19 @@ func (b *Backend) EnqueueL2MessageEspresso(ctx context.Context, tx *types.Transa
 	}
 	//	json.RawMessage is a []byte array, which is marshalled as a base64-encoded string.
 	//	Our sequencer API expects a JSON array.
-	payload := make([]int, len(txnBytes))
+	payload := make([]int8, len(txnBytes))
 	for i := range payload {
-		payload[i] = int(txnBytes[i])
+		payload[i] = int8(txnBytes[i])
 	}
 	txn := Transaction{
-		Vm:      b.config.EspressoNamespace,
+		Vm:      int(b.config.EspressoNamespace),
 		Payload: payload,
 	}
 	marshalled, err := json.Marshal(txn)
 	if err != nil {
 		return err
 	}
-	request, err := http.NewRequest("POST", b.config.HotShotUrl, bytes.NewBuffer(marshalled))
+	request, err := http.NewRequest("POST", b.config.HotShotUrl+"/submit/submit", bytes.NewBuffer(marshalled))
 	if err != nil {
 		return err
 	}
@@ -135,8 +136,9 @@ func (b *Backend) EnqueueL2MessageEspresso(ctx context.Context, tx *types.Transa
 	if err != nil {
 		return err
 	}
+	defer response.Body.Close()
 	if response.StatusCode != 200 {
-		return err
+		return fmt.Errorf("receieved unexpected status code: %v", response.StatusCode)
 	}
 	return nil
 }
