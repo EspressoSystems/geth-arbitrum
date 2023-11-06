@@ -65,7 +65,7 @@ func ConfigAddOptions(prefix string, f *flag.FlagSet) {
 	arbDebug := DefaultConfig.ArbDebug
 	f.Uint64(prefix+".arbdebug.block-range-bound", arbDebug.BlockRangeBound, "bounds the number of blocks arbdebug calls may return")
 	f.Uint64(prefix+".arbdebug.timeout-queue-bound", arbDebug.TimeoutQueueBound, "bounds the length of timeout queues arbdebug calls may return")
-	f.Bool(prefix+".espresso", DefaultConfig.Espresso, "if true, l2 transactions will be fetched from espresso sequencer")
+	f.Bool(prefix+".espresso", DefaultConfig.Espresso, "if true, the espresso sequencer is used for sequencing and DA")
 	f.String(prefix+".hotshot-url", DefaultConfig.HotShotUrl, "")
 	f.Uint64(prefix+".espresso-namespace", DefaultConfig.EspressoNamespace, "espresso namespace that corresponds the L2 chain")
 }
