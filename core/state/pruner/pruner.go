@@ -85,13 +85,16 @@ func NewPruner(db ethdb.Database, config Config) (*Pruner, error) {
 	if headBlock == nil {
 		return nil, errors.New("failed to load head block")
 	}
+	// Offline pruning is only supported in legacy hash based scheme.
+	triedb := trie.NewDatabase(db, trie.HashDefaults)
+
 	snapconfig := snapshot.Config{
 		CacheSize:  256,
 		Recovery:   false,
 		NoBuild:    true,
 		AsyncBuild: false,
 	}
-	snaptree, err := snapshot.New(snapconfig, db, trie.NewDatabase(db), headBlock.Root())
+	snaptree, err := snapshot.New(snapconfig, db, triedb, headBlock.Root())
 	if err != nil {
 		return nil, err // The relevant snapshot(s) might not exist
 	}
@@ -381,14 +384,7 @@ func dumpRawTrieDescendants(db ethdb.Database, root common.Hash, output *stateBl
 				output.Put(data.CodeHash, nil)
 			}
 			if data.Root != (common.Hash{}) {
-				// Lookup the preimage of account hash
-				preimage := tr.GetKey(accountIt.LeafKey())
-				if preimage == nil {
-					return errors.New("account address is not available")
-				}
-				address := common.BytesToAddress(preimage)
-
-				storageTr, err := sdb.OpenStorageTrie(key, address, data.Root)
+				storageTr, err := trie.NewStateTrie(trie.StorageTrieID(root, key, data.Root), sdb.TrieDB())
 				if err != nil {
 					return err
 				}
@@ -568,7 +564,9 @@ func RecoverPruning(datadir string, db ethdb.Database) error {
 		NoBuild:    true,
 		AsyncBuild: false,
 	}
-	snaptree, err := snapshot.New(snapconfig, db, trie.NewDatabase(db), headBlock.Root())
+	// Offline pruning is only supported in legacy hash based scheme.
+	triedb := trie.NewDatabase(db, trie.HashDefaults)
+	snaptree, err := snapshot.New(snapconfig, db, triedb, headBlock.Root())
 	if err != nil {
 		return err // The relevant snapshot(s) might not exist
 	}
