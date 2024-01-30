@@ -37,12 +37,7 @@ type Config struct {
 	ClassicRedirect        string        `koanf:"classic-redirect"`
 	ClassicRedirectTimeout time.Duration `koanf:"classic-redirect-timeout"`
 	MaxRecreateStateDepth  int64         `koanf:"max-recreate-state-depth"`
-	AllowMethod []string `koanf:"allow-method"`
-
-	// Espresso specific flags
-	Espresso          bool   `koanf:"espresso"`
-	HotShotUrl        string `koanf:"hotshot-url"`
-	EspressoNamespace uint64 `koanf:"espresso-namespace"`
+	AllowMethod            []string      `koanf:"allow-method"`
 }
 
 type ArbDebugConfig struct {
@@ -67,9 +62,6 @@ func ConfigAddOptions(prefix string, f *flag.FlagSet) {
 	arbDebug := DefaultConfig.ArbDebug
 	f.Uint64(prefix+".arbdebug.block-range-bound", arbDebug.BlockRangeBound, "bounds the number of blocks arbdebug calls may return")
 	f.Uint64(prefix+".arbdebug.timeout-queue-bound", arbDebug.TimeoutQueueBound, "bounds the length of timeout queues arbdebug calls may return")
-	f.Bool(prefix+".espresso", DefaultConfig.Espresso, "if true, the espresso sequencer is used for sequencing and DA")
-	f.String(prefix+".hotshot-url", DefaultConfig.HotShotUrl, "")
-	f.Uint64(prefix+".espresso-namespace", DefaultConfig.EspressoNamespace, "espresso namespace that corresponds the L2 chain")
 }
 
 const (
