@@ -1496,6 +1496,7 @@ func fillArbitrumNitroHeaderInfo(header *types.Header, fields map[string]interfa
 	fields["l1BlockNumber"] = hexutil.Uint64(info.L1BlockNumber)
 	fields["sendRoot"] = info.SendRoot
 	fields["sendCount"] = hexutil.Uint64(info.SendCount)
+	fields["hotShotHeight"] = hexutil.Uint64(info.HotShotHeight)
 }
 
 // rpcMarshalHeader uses the generalized output filler, then adds the total difficulty field, which requires
