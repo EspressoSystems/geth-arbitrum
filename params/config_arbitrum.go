@@ -22,6 +22,9 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
+const ArbosVersion_FixRedeemGas = uint64(11)
+const ArbosVersion_Stylus = uint64(30)
+
 type ArbitrumChainParams struct {
 	EnableArbOS               bool
 	AllowDebugPrecompiles     bool
@@ -112,7 +115,7 @@ func ArbitrumDevTestParams() ArbitrumChainParams {
 		EnableArbOS:               true,
 		AllowDebugPrecompiles:     true,
 		DataAvailabilityCommittee: false,
-		InitialArbOSVersion:       20,
+		InitialArbOSVersion:       30,
 		InitialChainOwner:         common.Address{},
 	}
 }
@@ -122,7 +125,7 @@ func ArbitrumDevTestDASParams() ArbitrumChainParams {
 		EnableArbOS:               true,
 		AllowDebugPrecompiles:     true,
 		DataAvailabilityCommittee: true,
-		InitialArbOSVersion:       20,
+		InitialArbOSVersion:       30,
 		InitialChainOwner:         common.Address{},
 	}
 }
