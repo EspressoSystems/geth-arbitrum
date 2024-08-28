@@ -507,7 +507,6 @@ type HeaderInfo struct {
 	SendCount          uint64
 	L1BlockNumber      uint64
 	ArbOSFormatVersion uint64
-	HotShotHeight      uint64
 }
 
 func (info HeaderInfo) extra() []byte {
@@ -519,7 +518,6 @@ func (info HeaderInfo) mixDigest() [32]byte {
 	binary.BigEndian.PutUint64(mixDigest[:8], info.SendCount)
 	binary.BigEndian.PutUint64(mixDigest[8:16], info.L1BlockNumber)
 	binary.BigEndian.PutUint64(mixDigest[16:24], info.ArbOSFormatVersion)
-	binary.BigEndian.PutUint64(mixDigest[24:32], info.HotShotHeight)
 	return mixDigest
 }
 
@@ -539,6 +537,5 @@ func DeserializeHeaderExtraInformation(header *Header) HeaderInfo {
 	extra.SendCount = binary.BigEndian.Uint64(header.MixDigest[:8])
 	extra.L1BlockNumber = binary.BigEndian.Uint64(header.MixDigest[8:16])
 	extra.ArbOSFormatVersion = binary.BigEndian.Uint64(header.MixDigest[16:24])
-	extra.HotShotHeight = binary.BigEndian.Uint64(header.MixDigest[24:32])
 	return extra
 }
