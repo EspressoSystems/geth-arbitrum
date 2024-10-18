@@ -76,7 +76,7 @@ const (
 	JumpdestGas   uint64 = 1     // Once per JUMPDEST operation.
 	EpochDuration uint64 = 30000 // Duration between proof-of-work epochs.
 
-	CreateDataGas         uint64 = 200   //
+	CreateDataGas         uint64 = 20    //
 	CallCreateDepth       uint64 = 1024  // Maximum depth of call/create stack.
 	ExpGas                uint64 = 10    // Once per EXP instruction
 	LogGas                uint64 = 375   // Per LOG* operation.
