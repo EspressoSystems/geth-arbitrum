@@ -37,7 +37,7 @@ type ArbitrumChainParams struct {
 	MaxCodeSize               uint64 `json:"MaxCodeSize,omitempty"`     // Maximum bytecode to permit for a contract. 0 value implies params.DefaultMaxCodeSize
 	MaxInitCodeSize           uint64 `json:"MaxInitCodeSize,omitempty"` // Maximum initcode to permit in a creation transaction and create instructions. 0 value implies params.DefaultMaxInitCodeSize
 
-	EnableEspresso bool
+	EspressoTEEVerifierAddress common.Address
 }
 
 func (c *ChainConfig) IsArbitrum() bool {
